@@ -47,6 +47,7 @@ declare module "http" {
     method?: string,
     headers?: (string | number)[],
     body?: boolean | string | ArrayBuffer,
+    reqBodyChunked?: boolean,
     response?: typeof String | typeof ArrayBuffer
   }
 

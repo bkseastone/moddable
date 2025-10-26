@@ -4,9 +4,11 @@
 		"$(MODDABLE)/examples/io/tcp/websocketclient/manifest_websocketclient.json"
 	],
 	"modules": {
-		"embedded:io/tcp/websocket": "./WebSocket"
+		"embedded:io/tcp/websocket": [
+			"./WebSocket"
+		]
 	},
 	"preload": [
-		"embedded:*"
+		"embedded:io/tcp/websocket"
 	]
 }

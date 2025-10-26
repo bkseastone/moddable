@@ -25,6 +25,27 @@
 import {Socket, Listener} from "socket";
 import Timer from "timer";
 
+function getUtf8ByteLength(str) {
+	if (/^[\x00-\x7f]*$/.test(str)) {
+		return str.length;
+	} else {
+		let totalLength = 0;
+		for (let i = 0; i < str.length; i++) {
+			let charCode = str.charCodeAt(i);
+			if (charCode < 0x80) {
+				totalLength += 1;
+			} else if (charCode < 0x800) {
+				totalLength += 2;
+			} else if (charCode < 0x10000) {
+				totalLength += 3;
+			} else if (charCode < 0x200000) {
+				totalLength += 4;
+			}
+		}
+		return totalLength;
+	}
+}
+
 /*
 	Client
 
@@ -56,11 +77,20 @@ export class Request {
 			return;
 		}
 
-		dictionary = {port: 80, method: "GET", path: "/", Socket, ...dictionary};
+		if (dictionary.method) {
+			dictionary = {Socket, ...dictionary};
+		} else {
+			dictionary = {port: 80, method: "GET", path: "/", Socket, ...dictionary};
+		}
 
 		this.method = dictionary.method;
 		this.path = dictionary.path;
 		this.host = dictionary.host ? dictionary.host : dictionary.address;
+		this.reqBodyChunked = dictionary.reqBodyChunked ? dictionary.reqBodyChunked : false;
+		if (true === this.reqBodyChunked) {
+			dictionary.headers = dictionary.headers ?? [];
+			dictionary.headers.push("Transfer-Encoding", "chunked")
+		}
 		if (dictionary.headers)
 			this.headers = dictionary.headers;
 		if (dictionary.body)
@@ -157,7 +187,7 @@ function callback(message, value) {
 		}
 
 		if (this.body && (true !== this.body) && !length) {
-			length = (this.body instanceof ArrayBuffer) ? this.body.byteLength : this.body.length;
+			length = (this.body instanceof ArrayBuffer) ? this.body.byteLength : getUtf8ByteLength(this.body);
 			parts.push(`content-length: ${length}\r\n`);
 		}
 
@@ -204,9 +234,18 @@ function callback(message, value) {
 			if (true === this.body) {
 				let body = this.callback(Request.requestFragment, socket.write());
 				if (undefined !== body) {
-					socket.write(body);
+					if (true === this.reqBodyChunked) {
+						let count = 0;
+						count = ("string" === typeof body) ? body.length : body.byteLength;
+						socket.write(count.toString(16).toUpperCase(), "\r\n", body, "\r\n");
+					}
+					else {
+						socket.write(body);
+					}
 					return;
 				}
+				else if (true === this.reqBodyChunked)
+					socket.write("0\r\n\r\n");
 			}
 			else
 				socket.write(this.body);

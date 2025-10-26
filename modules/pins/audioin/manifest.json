@@ -1,9 +1,16 @@
 {
-	"preload": "audioin",
+	"modules": {
+		"pins/audioin": [
+			"./audioin"
+		]
+	},
+	"preload": [
+		"pins/audioin"
+	],
 	"platforms": {
 		"esp32/*": {
 			"modules": {
-				"*": [
+				"pins/audioin": [
 					"./audioin",
 					"./esp32/audioin"
 				]

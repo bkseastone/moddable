@@ -36,24 +36,27 @@
 #endif
 
 #ifndef MODDEF_AUDIOIN_SAMPLERATE
-	#define MODDEF_AUDIOIN_SAMPLERATE (8000)
+	#define MODDEF_AUDIOIN_SAMPLERATE (16000)
 #endif
 #ifndef MODDEF_AUDIOIN_BITSPERSAMPLE
 	#define MODDEF_AUDIOIN_BITSPERSAMPLE (16)
 #endif
 
+// ref: 
+//   1. https://atomic14.com/2020/09/12/esp32-audio-input.html
+//   2. https://blog.csdn.net/ZHONGCAI0901/article/details/116131776
 #if ESP32
 	#ifndef MODDEF_AUDIOIN_I2S_NUM
 		#define MODDEF_AUDIOIN_I2S_NUM (1)
 	#endif
 	#ifndef MODDEF_AUDIOIN_I2S_BCK_PIN
-		#define MODDEF_AUDIOIN_I2S_BCK_PIN (32)
+		#define MODDEF_AUDIOIN_I2S_BCK_PIN (12)
 	#endif
 	#ifndef MODDEF_AUDIOIN_I2S_LR_PIN
-		#define MODDEF_AUDIOIN_I2S_LR_PIN (33)
+		#define MODDEF_AUDIOIN_I2S_LR_PIN (13)
 	#endif
 	#ifndef MODDEF_AUDIOIN_I2S_DATAIN
-		#define MODDEF_AUDIOIN_I2S_DATAIN (27)
+		#define MODDEF_AUDIOIN_I2S_DATAIN (34)
 	#endif
 	#ifndef MODDEF_AUDIOIN_I2S_ADC
 		#define MODDEF_AUDIOIN_I2S_ADC (0)
